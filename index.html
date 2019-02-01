@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="jquery.js"></script>
+    <script src="data_generator.js"></script>
+    <script src="https://momentjs.com/downloads/moment.js"></script>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link href="twit.png" rel="shortcut icon" type="image/x-icon" />
+    <title>Twiddler!</title>
+
+  </head>
+  <body>
+    <script>
+
+      $(document).ready(function(){
+        window.visitor;
+        var $header = $('<header>Twiddler</header>');
+        var $refresh = $("<button>Twiddle for new message!</button>");
+        var $body = $('body');
+        var $write = $("<br><input type='text' placeholder ='Write a message and press enter'> </input>");
+        var $feed = $('<div class = "feed"></div>');
+        $body.html("").append($header).append($refresh).append($write);
+        $feed.appendTo($body);
+
+       
+
+
+       //need to get tweets from data generator
+       const generateTweets = function(x){
+       
+        $feed.html("");
+
+        if (x === 'all') {
+          source = streams.home; // {streams} comes from data_generator.js
+        } else if (x) {
+          source = streams.users[x]; // get info from input 
+        }
+
+        var index = streams.home.length - 1;
+        while(index >= 0){
+          var tweet = streams.home[index];
+          
+          //get timestamp
+          /*
+          var date= streams.home[index].created_at;
+          var convertMonth = { 0: 'Jan', 1: 'Feb', 2: 'Mar', 3: 'Apr', 4: 'May', 5: 'Jun', 6: 'Jul', 7: 'Aug', 8: 'Sep', 9: 'Oct', 10: 'Nov', 11: 'Dec' };
+          var minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+          var timeStamp = date.getHours() > 12 ? (date.getHours() - 12) + ':' + minutes + ' pm' : date.getHours() + ':' + minutes + ' am';
+          var timeCreated = convertMonth[date.getMonth()] + ' ' + date.getDate() + " " + timeStamp;
+          */
+
+          
+
+          //display tweets message, user, time 
+          var $tweets = $('<div class = "tweets"></div>');
+
+          var readableTime = moment(tweet.created_at).fromNow();
+          $tweets.html('<a href="#' + tweet.user + '"> @' + tweet.user + '</a>' + ': ' + tweet.message  + '<br>' + readableTime);
+          var $img = $('<img src="twit.png"></img>');
+          $tweets.prepend($img);
+
+
+          $tweets.appendTo($feed);
+          index -= 1;
+        }
+
+      //display user tweets using event listener 
+      $('a').on('click', function(e) {
+          e.preventDefault();
+          loadUserTweets(this.getAttribute('href'));
+          });
+
+       }
+       generateTweets();
+
+       //display tweets 
+
+        $refresh.on('click', function (e) {
+          e.preventDefault();
+          generateTweets('all');
+        });
+
+
+       var loadUserTweets = function(user) {
+          $('div a[href!="' + user + '"]').parent().remove();
+          var $showUserTweets = $('<div id="info">Showing tweets from @' + user.slice(1) + '. Click Twiddle to go back.' + '</div>');
+          $('button').after($showUserTweets);
+        };
+
+
+       //write tweets 
+      $('input').keypress(function (e) {
+        if (e.which === 13) {
+        window.visitor = 'guest';
+        if (!streams.users[window.visitor]) {
+          streams.users[window.visitor] = [];
+        }
+        writeTweet($(this).val());
+        $(this).val('');
+        generateTweets('all');
+      }
+      });
+
+
+      
+    });
+
+    </script>
+    
+    
+  </body>
+
+</html>
