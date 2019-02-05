@@ -26,15 +26,16 @@
 
 
        //need to get tweets from data generator
-       const generateTweets = function(x){
+       const generateTweets = function(){
        
         $feed.html("");
-
+        /*
         if (x === 'all') {
           source = streams.home; // {streams} comes from data_generator.js
         } else if (x) {
           source = streams.users[x]; // get info from input 
         }
+        */
 
         var index = streams.home.length - 1;
         while(index >= 0){
@@ -48,7 +49,6 @@
           var timeStamp = date.getHours() > 12 ? (date.getHours() - 12) + ':' + minutes + ' pm' : date.getHours() + ':' + minutes + ' am';
           var timeCreated = convertMonth[date.getMonth()] + ' ' + date.getDate() + " " + timeStamp;
           */
-
           
 
           //display tweets message, user, time 
@@ -77,7 +77,7 @@
 
         $refresh.on('click', function (e) {
           e.preventDefault();
-          generateTweets('all');
+          generateTweets();
         });
 
 
@@ -92,12 +92,14 @@
       $('input').keypress(function (e) {
         if (e.which === 13) {
         window.visitor = 'guest';
+        
         if (!streams.users[window.visitor]) {
           streams.users[window.visitor] = [];
         }
+
         writeTweet($(this).val());
         $(this).val('');
-        generateTweets('all');
+        generateTweets();
       }
       });
 
